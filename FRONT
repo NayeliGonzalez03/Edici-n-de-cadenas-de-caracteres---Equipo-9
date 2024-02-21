@@ -1,0 +1,88 @@
+from tkinter import *
+from tkinter import font, messagebox, filedialog
+import pandas as pd
+import time
+
+def leer_csv():
+    # Solicitar al usuario seleccionar el archivo CSV
+    nombre_archivo = filedialog.askopenfilename(filetypes=[("Archivos CSV", "*.csv")])
+
+    try:
+        # Intentar leer el archivo CSV
+        datos = pd.read_csv(nombre_archivo)
+
+        # Mostrar los datos en la caja de texto
+        txt_output.delete(1.0, END)  # Limpiar la caja de texto antes de mostrar nuevos datos
+        txt_output.insert(END, datos.to_string(index=False))  # Mostrar los datos en la caja de texto
+        
+        # Programar la apertura de la segunda ventana después de 5 segundos
+        ventana.after(4000, lambda: mostrar_ventana_botones(datos))
+
+    except FileNotFoundError:
+        # Manejar el caso en el que el archivo no se encuentre
+        messagebox.showerror("Error", "El archivo especificado no se encontró.")
+    except Exception as e:
+        # Manejar cualquier otro error inesperado
+        messagebox.showerror("Error", f"Se produjo un error: {e}")
+        
+ventana = Tk()
+
+ventana.title("ACTIVIDAD 4")
+ventana.geometry("1200x700")
+ventana.configure(bg="#F9EBEA")
+ventana.iconbitmap(r'C:\QUINTO SEMENTRE\ANALISIS DE ALGORITMOS\ACTIVIDAD 4_Edicion de cadenas de caracteres\cereza.ico')
+
+font_style = font.Font(family="Century Gothic", size=12)
+
+lbl = Label(ventana, text="EQUIPO 9", bg="#F9EBEA", font=("Palatino", 23, "bold"))
+lbl.pack(pady=10)
+
+lbl = Label(ventana, text="ACTIVIDAD 4", bg="#F9EBEA", font=("Palatino", 12))
+lbl.pack(pady=10)
+
+btn1 = Button(ventana, text="Leer archivo principal", command=leer_csv, bg="#FF69B4", fg="white", font=font_style)
+btn1.pack(pady=5)
+
+
+output_frame = Frame(ventana, bg="#FFFFFF")
+output_frame.pack(pady=10, padx=10, fill=BOTH, expand=True)
+
+txt_output = Text(output_frame, bg="#F0F0F0", font=("Century Gothic", 12), wrap=WORD)
+txt_output.pack(fill=BOTH, expand=True)
+
+
+
+def mostrar_ventana_botones(datos):
+    ventana_botones = Toplevel(ventana)
+    ventana_botones.title("Opciones")
+    ventana_botones.geometry("800x600")
+    ventana_botones.configure(bg="#F9EBEA")
+    font_style = font.Font(family="Century Gothic", size=12)
+    
+
+    # Leer datos del archivo CSV y mostrarlos en una caja de texto
+    datos_csv = pd.read_csv("variantes.csv")
+    
+    # Configurar una caja de texto ajustable con barras de desplazamiento
+    txt_datos_csv = Text(ventana_botones, bg="#FFFFFF", font=font_style)
+    txt_datos_csv.config(height=10, width=50)  # Configurar el tamaño de la caja de texto
+    txt_datos_csv.insert(END, datos_csv.to_string(index=False))
+    txt_datos_csv.pack(fill=BOTH, expand=True)
+
+    # Agregar barras de desplazamiento
+    scroll_y = Scrollbar(ventana_botones, orient=VERTICAL, command=txt_datos_csv.yview)
+    scroll_y.pack(side=RIGHT, fill=Y)
+    txt_datos_csv.config(yscrollcommand=scroll_y.set)
+
+    lbl_variantes = Label(ventana_botones, text="Índices de variantes a modificar (separados por comas):", bg="#F9EBEA", font=font_style)
+    lbl_variantes.pack()
+
+    txt_variantes = Entry(ventana_botones, bg="#FFC0CB", font=font_style)
+    txt_variantes.pack(pady=5, padx=10, fill=X)
+
+    btn_aplicar = Button(ventana_botones, text="Aplicar", bg="#FF69B4", fg="white", font=font_style)
+    btn_aplicar.pack(pady=5)
+
+    btn_opcion3 = Button(ventana_botones, text="Todas las posibles combinaciones", bg="#FF69B4", fg="white", font=font_style)
+    btn_opcion3.pack(pady=5)
+ventana.mainloop()
